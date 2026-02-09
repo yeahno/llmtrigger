@@ -1,5 +1,4 @@
 # LLM Trigger（模型触发器）
-[![LLM Trigger Status](https://github.com/OWNER/REPO/actions/workflows/main.yml/badge.svg)](https://github.com/OWNER/REPO/actions/workflows/main.yml)
 
 这是一个用于定期调用大模型 API 的 Python 脚本，通过 GitHub Actions 自动运行。主要用于模拟活跃度、定时测试 API 连通性或作为简单的定时任务模板。
 
