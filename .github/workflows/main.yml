@@ -16,10 +16,10 @@ jobs:
     runs-on: ubuntu-latest
     env:
       API_KEY: ${{ secrets.API_KEY }}
-      API_URL: ${{ secrets.API_URL }}
+      API_URL: ${{ secrets.API_URL || vars.API_URL }}
       API_TYPE: ${{ secrets.API_TYPE }}
       MODEL_NAME: ${{ secrets.MODEL_NAME }}
-      PROMPT: ${{ secrets.PROMPT }}
+      PROMPT: ${{ secrets.PROMPT || vars.PROMPT }}
       ANTHROPIC_FORCE_COMPLETIONS: ${{ secrets.ANTHROPIC_FORCE_COMPLETIONS }}
     
     steps:

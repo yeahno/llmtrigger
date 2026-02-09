@@ -2,18 +2,31 @@ import os
 import sys
 import datetime
 from dotenv import load_dotenv
+from urllib.parse import urlparse
 
 # 加载本地 .env 文件（如果存在），方便本地调试
 load_dotenv()
 
 def get_env_variable(var_name, default=None, required=True):
-    """获取环境变量，如果必须且不存在则报错"""
-    value = os.environ.get(var_name, default)
-    if required and not value:
-        print(f"Error: 环境变量 {var_name} 未设置。")
-        print("请在 GitHub Secrets 或 .env 文件中配置该变量。")
-        sys.exit(1)
+    """获取环境变量：空字符串视为未设置；支持默认值与必填校验"""
+    raw = os.environ.get(var_name)
+    value = raw if raw is not None and raw.strip() != "" else None
+    if value is None:
+        if required and (default is None or str(default).strip() == ""):
+            print(f"Error: 环境变量 {var_name} 未设置。")
+            print("请在 GitHub Secrets 或 .env 文件中配置该变量。")
+            sys.exit(1)
+        return default
     return value
+
+def debug_print_config(api_type: str, base_url: str, model_name: str, prompt: str) -> None:
+    """安全打印关键配置（不打印 API_KEY，URL 仅显示域名），便于 Actions 调试"""
+    prompt_info = f"len={len(prompt) if prompt else 0}"
+    print("配置详情（安全）:")
+    print(f"- API_TYPE: {api_type}")
+    print(f"- API_URL: {base_url}")
+    print(f"- MODEL_NAME: {model_name}")
+    print(f"- PROMPT: {prompt_info}")
 
 def call_openai_style(api_key, base_url, model_name, prompt):
     """使用 OpenAI SDK 调用"""
@@ -175,6 +188,7 @@ def main():
     prompt = get_env_variable("PROMPT", default="Hello from Actions", required=False)
 
     print(f"配置信息: Type={api_type}, URL={base_url}, Model={model_name}")
+    debug_print_config(api_type, base_url, model_name, prompt)
 
     # 2. 根据类型调用不同的处理函数
     content = None
