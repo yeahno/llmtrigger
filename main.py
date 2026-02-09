@@ -86,7 +86,11 @@ def call_anthropic_style(api_key, base_url, model_name, prompt):
         try:
             # 1) messages 兼容
             url = base_url.rstrip("/") + "/v1/messages"
-            headers = {"x-api-key": api_key, "content-type": "application/json"}
+            headers = {
+                "x-api-key": api_key,
+                "content-type": "application/json",
+                "anthropic-version": "2023-06-01",
+            }
             payload = {
                 "model": model_name,
                 "max_tokens": 1024,
@@ -140,7 +144,7 @@ def main():
         default=("glm-4.7" if api_type == "anthropic" else "gpt-3.5-turbo"),
         required=False
     )
-    prompt = get_env_variable("PROMPT", default="你好！", required=False)
+    prompt = get_env_variable("PROMPT", default="Hello！", required=False)
 
     print(f"配置信息: Type={api_type}, URL={base_url}, Model={model_name}")
 

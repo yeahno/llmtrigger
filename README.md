@@ -84,3 +84,10 @@
 - 请确保你的 API 额度充足。
 - GitHub Actions 的定时任务可能有 5-15 分钟的延迟，属于正常现象。
 - 请勿将 API Key 直接写入代码中，务必使用 Secrets。
+
+## 故障排查
+- Anthropic 400 且提示“未正常接收到prompt参数”：
+  - 确认在 Actions 中 `PROMPT` 是否已设置；若未设置，脚本会使用英文默认值以避免编码问题。
+  - 智谱 Anthropic 兼容接口存在 messages/completions 两种路由差异；脚本已内置自动回退至 `/v1/complete` 并构造 `Human/Assistant` 模板。
+  - 若仍失败，建议改用 OpenAI 兼容接口：`API_TYPE=openai`，`API_URL=https://open.bigmodel.cn/api/paas/v4/`。
+- 查看环境变量是否存在：工作流已添加“Debug env presence (masked)”步骤，只显示是否设置，不输出具体值。
