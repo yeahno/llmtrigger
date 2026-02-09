@@ -54,12 +54,13 @@
 
 ### 4. 修改定时频率
 
-默认频率为每天 **6:00 (UTC)** 执行。如需修改：
-1. 编辑 `.github/workflows/llm_scheduler.yml` 文件。
-2. 修改 `cron: '0 6 * * *'` 部分为你需要的表达式。
+默认频率为每天 **北京时间 6:00 (UTC+8)** 执行：
+1. 编辑 `.github/workflows/main.yml` 文件。
+2. 设置 `cron: '0 22 * * *'`（对应每天 22:00 UTC，即北京时间 6:00）。
    - 每小时: `'0 * * * *'`
-   - 每天 北京时间 6 点: `'0 22 * * *'` (UTC 时间换算：UTC+8)
    - 每天 北京时间 8 点: `'0 0 * * *'` (UTC 时间换算：UTC+8)
+
+提示：GitHub Actions 的 cron 使用 UTC；中国不实行夏令时，UTC 与北京时间固定差值为 +8。
 
 ## 本地运行
 
@@ -85,6 +86,11 @@
 - 请确保你的 API 额度充足。
 - GitHub Actions 的定时任务可能有 5-15 分钟的延迟，属于正常现象。
 - 请勿将 API Key 直接写入代码中，务必使用 Secrets。
+
+### 环境变量与调试
+- 本项目在 job 级别注入 Secrets 到 env，调试步骤会打印是否 SET/EMPTY（不泄露值）。
+- 如需日志显示不被掩码的 API_URL/PROMPT，可在 Actions 的 Variables 中配置同名变量作为回退。
+- 运行日志会安全打印 API_TYPE、API_URL、MODEL_NAME、PROMPT 长度，便于排查配置。
 
 ## 故障排查
 - Anthropic 400 且提示“未正常接收到prompt参数”：

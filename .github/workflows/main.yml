@@ -6,7 +6,7 @@ on:
   # 示例: '0 6 * * *' 表示每天 6:00 (UTC)
   # 注意: GitHub Actions 使用 UTC 时间，国内(北京时区)为 UTC+8
   schedule:
-    - cron: '0 6 * * *'
+    - cron: '0 22 * * *'
   
   # 允许在 Actions 页面手动触发
   workflow_dispatch:
