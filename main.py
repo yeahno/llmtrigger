@@ -185,7 +185,7 @@ def main():
         required=False
     )
     force_comp = get_env_variable("ANTHROPIC_FORCE_COMPLETIONS", default="false", required=False).lower() == "true"
-    prompt = get_env_variable("PROMPT", default="Hello from Actions", required=False)
+    prompt = get_env_variable("PROMPT", default="Hello", required=False)
 
     print(f"配置信息: Type={api_type}, URL={base_url}, Model={model_name}")
     debug_print_config(api_type, base_url, model_name, prompt)
