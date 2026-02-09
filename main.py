@@ -72,9 +72,10 @@ def call_anthropic_style(api_key, base_url, model_name, prompt):
         message = client.messages.create(
             model=model_name,
             max_tokens=1024,
-            messages=[
-                {"role": "user", "content": prompt}
-            ]
+            messages=[{
+                "role": "user",
+                "content": [{"type": "text", "text": prompt}]
+            }]
         )
         if message.content:
             return message.content[0].text
@@ -102,8 +103,12 @@ def main():
         default_url = "https://api.anthropic.com"
         
     base_url = get_env_variable("API_URL", default=default_url, required=False)
-    model_name = get_env_variable("MODEL_NAME", default="gpt-3.5-turbo", required=False)
-    prompt = get_env_variable("PROMPT", default="你好，请用一句话简述一下当前的时间（无需精确到秒）和一种积极的心态。", required=False)
+    model_name = get_env_variable(
+        "MODEL_NAME",
+        default=("glm-4.7" if api_type == "anthropic" else "gpt-3.5-turbo"),
+        required=False
+    )
+    prompt = get_env_variable("PROMPT", default="你好！", required=False)
 
     print(f"配置信息: Type={api_type}, URL={base_url}, Model={model_name}")
 
