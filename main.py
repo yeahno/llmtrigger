@@ -69,7 +69,7 @@ def call_anthropic_style(api_key, base_url, model_name, prompt):
         message = client.messages.create(
             model=model_name,
             max_tokens=1024,
-            messages=[{"role": "user", "content": prompt}],
+            messages=[{"role": "user", "content": [{"type": "text", "text": prompt}]}],
         )
         # 智谱返回 content 可能为数组，取首段文本
         if getattr(message, "content", None):
@@ -94,7 +94,7 @@ def call_anthropic_style(api_key, base_url, model_name, prompt):
             payload = {
                 "model": model_name,
                 "max_tokens": 1024,
-                "messages": [{"role": "user", "content": prompt}],
+                "messages": [{"role": "user", "content": [{"type": "text", "text": prompt}]}],
                 "stream": False,
             }
             resp = httpx.post(url, headers=headers, json=payload, timeout=60)
@@ -171,7 +171,7 @@ def main():
         default=("glm-4.7" if api_type == "anthropic" else "gpt-3.5-turbo"),
         required=False
     )
-    force_comp = get_env_variable("ANTHROPIC_FORCE_COMPLETIONS", default="true", required=False).lower() == "true"
+    force_comp = get_env_variable("ANTHROPIC_FORCE_COMPLETIONS", default="false", required=False).lower() == "true"
     prompt = get_env_variable("PROMPT", default="Hello from Actions", required=False)
 
     print(f"配置信息: Type={api_type}, URL={base_url}, Model={model_name}")
