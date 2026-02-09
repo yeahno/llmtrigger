@@ -121,6 +121,33 @@ def call_anthropic_style(api_key, base_url, model_name, prompt):
             print(f"Error: Anthropic 回退调用失败: {e2}")
         sys.exit(1)
 
+def call_anthropic_completions(api_key, base_url, model_name, prompt):
+    """使用 Anthropic Completions 接口调用"""
+    try:
+        import httpx
+    except Exception:
+        print("Error: 缺少 httpx 依赖")
+        sys.exit(1)
+    url = base_url.rstrip("/") + "/v1/complete"
+    headers = {
+        "x-api-key": api_key,
+        "content-type": "application/json",
+        "anthropic-version": "2023-06-01",
+    }
+    payload = {
+        "model": model_name,
+        "prompt": f"\n\nHuman: {prompt}\n\nAssistant:",
+        "max_tokens_to_sample": 512,
+        "stop_sequences": ["\n\nHuman:"],
+    }
+    print("正在发送请求 (Anthropic Completions)...")
+    resp = httpx.post(url, headers=headers, json=payload, timeout=60)
+    if resp.status_code == 200:
+        data = resp.json()
+        return data.get("completion")
+    print(f"Error: Completions 调用失败: HTTP {resp.status_code} - {resp.text}")
+    sys.exit(1)
+
 def main():
     """
     主函数：调用大模型 API
@@ -144,14 +171,18 @@ def main():
         default=("glm-4.7" if api_type == "anthropic" else "gpt-3.5-turbo"),
         required=False
     )
-    prompt = get_env_variable("PROMPT", default="Hello！", required=False)
+    force_comp = get_env_variable("ANTHROPIC_FORCE_COMPLETIONS", default="true", required=False).lower() == "true"
+    prompt = get_env_variable("PROMPT", default="Hello from Actions", required=False)
 
     print(f"配置信息: Type={api_type}, URL={base_url}, Model={model_name}")
 
     # 2. 根据类型调用不同的处理函数
     content = None
     if api_type == "anthropic":
-        content = call_anthropic_style(api_key, base_url, model_name, prompt)
+        if force_comp:
+            content = call_anthropic_completions(api_key, base_url, model_name, prompt)
+        else:
+            content = call_anthropic_style(api_key, base_url, model_name, prompt)
     else:
         content = call_openai_style(api_key, base_url, model_name, prompt)
 

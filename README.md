@@ -44,6 +44,7 @@
 - `API_URL`: `https://open.bigmodel.cn/api/anthropic`
 - `MODEL_NAME`: `glm-4` (或其他智谱模型)
 - `API_KEY`: 你的智谱 API Key
+- 可选：`ANTHROPIC_FORCE_COMPLETIONS=true` 强制使用 completions 路由，规避部分代理/网关对 messages 的差异。
 
 ### 3. 启用 GitHub Actions
 
