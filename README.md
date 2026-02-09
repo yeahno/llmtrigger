@@ -1,5 +1,5 @@
 # LLM Trigger（模型触发器）
-[![LLM Trigger Status](https://github.com/OWNER/REPO/actions/workflows/llm_scheduler.yml/badge.svg)](https://github.com/OWNER/REPO/actions/workflows/llm_scheduler.yml)
+[![LLM Trigger Status](https://github.com/OWNER/REPO/actions/workflows/main.yml/badge.svg)](https://github.com/OWNER/REPO/actions/workflows/main.yml)
 
 这是一个用于定期调用大模型 API 的 Python 脚本，通过 GitHub Actions 自动运行。主要用于模拟活跃度、定时测试 API 连通性或作为简单的定时任务模板。
 
@@ -9,6 +9,7 @@
 - **配置灵活**: 支持自定义 API URL、Key、模型名称和 Prompt。
 - **双模式支持**: 同时支持 **OpenAI** (默认) 和 **Anthropic** 两种 SDK 调用模式。
 - **广泛兼容**: 兼容 OpenAI、DeepSeek、Claude (via OneAPI)、智谱 (OpenAI/Anthropic 模式) 等多种服务。
+
 
 ## 快速开始
 
