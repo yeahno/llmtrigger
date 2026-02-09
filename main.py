@@ -59,10 +59,7 @@ def call_anthropic_style(api_key, base_url, model_name, prompt):
 
     print("正在初始化 Anthropic 客户端...")
     try:
-        client = Anthropic(
-            api_key=api_key,
-            base_url=base_url
-        )
+        client = Anthropic(api_key=api_key, base_url=base_url)
     except Exception as e:
         print(f"Error: 初始化 Anthropic 客户端失败: {e}")
         sys.exit(1)
@@ -72,17 +69,52 @@ def call_anthropic_style(api_key, base_url, model_name, prompt):
         message = client.messages.create(
             model=model_name,
             max_tokens=1024,
-            messages=[{
-                "role": "user",
-                "content": [{"type": "text", "text": prompt}]
-            }]
+            messages=[{"role": "user", "content": prompt}],
         )
-        if message.content:
-            return message.content[0].text
-        else:
-            return None
+        # 智谱返回 content 可能为数组，取首段文本
+        if getattr(message, "content", None):
+            first = message.content[0]
+            return getattr(first, "text", None) or str(first)
+        return None
     except Exception as e:
         print(f"Error: Anthropic API 调用失败: {e}")
+        # 回退到原生 HTTP 兼容调用（messages 与 completions 两种格式）
+        try:
+            import httpx
+        except Exception:
+            sys.exit(1)
+        try:
+            # 1) messages 兼容
+            url = base_url.rstrip("/") + "/v1/messages"
+            headers = {"x-api-key": api_key, "content-type": "application/json"}
+            payload = {
+                "model": model_name,
+                "max_tokens": 1024,
+                "messages": [{"role": "user", "content": prompt}],
+                "stream": False,
+            }
+            resp = httpx.post(url, headers=headers, json=payload, timeout=60)
+            if resp.status_code == 200:
+                data = resp.json()
+                content = data.get("content") or data.get("message", {}).get("content")
+                if isinstance(content, list) and content:
+                    return content[0].get("text") or str(content[0])
+                return str(content) if content else None
+            # 2) 若服务提示需要 prompt，则尝试 completions 兼容
+            url2 = base_url.rstrip("/") + "/v1/complete"
+            prompt_text = f"\n\nHuman: {prompt}\n\nAssistant:"
+            payload2 = {
+                "model": model_name,
+                "prompt": prompt_text,
+                "max_tokens_to_sample": 1024,
+                "stop_sequences": ["\n\nHuman:"],
+            }
+            resp2 = httpx.post(url2, headers=headers, json=payload2, timeout=60)
+            if resp2.status_code == 200:
+                data2 = resp2.json()
+                return data2.get("completion")
+        except Exception as e2:
+            print(f"Error: Anthropic 回退调用失败: {e2}")
         sys.exit(1)
 
 def main():
